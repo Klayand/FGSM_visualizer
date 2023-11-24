@@ -157,7 +157,7 @@ def main():
             st.divider()
 
             st.image(f"./pic/{uploaded_file.name.split('.')[0]}_noise_image.png", caption="Noise Image", use_column_width=True)
-            st.write(f":: The noise image after attack.")
+            st.write(f":space_invader: The noise image after attack.")
             st.divider()
 
             st.image(f"./pic/{uploaded_file.name.split('.')[0]}_difference.png", caption="Output Difference", use_column_width=True)
