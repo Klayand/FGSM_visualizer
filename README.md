@@ -48,6 +48,7 @@ Your insights can make this tool even better! Feel free to fork, make enhancemen
 
 
 ![Original Image](./pic/dog.jpg) ![Attacked Image](./pic/dog_attacked_image.png)  
-![Gradient Distribution](./pic/dog_peturbed_noise.png) ![Prediction Difference](./pic/dog_difference.png)  
+![Gradient Distribution](./pic/dog_gradient_distribution.png) ![Noise Image](./pic/dog_noise_image.png)   
+![Prediction Difference](./pic/dog_difference.png)  
 
 
