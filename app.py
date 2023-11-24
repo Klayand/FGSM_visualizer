@@ -13,7 +13,14 @@ from torchvision import models, transforms
 from utils import show_icon
 
 
-def plot_peturbed_noise(uploaded_file, sign_data_grad):
+def plot_perturbed_image(uploaded_file, sign_data_grad):
+    noise = sign_data_grad.squeeze(0).permute(1, 2, 0).numpy()
+
+    noise_image = (noise * 255).astype(np.uint8)
+    cv2.imwrite(f'./pic/{uploaded_file}_noise_image.png', noise_image)
+
+
+def plot_gradinet_distribution(uploaded_file, sign_data_grad):
     gradients = sign_data_grad.squeeze(0).permute(1, 2, 0).numpy()
 
     plt.figure()
@@ -21,15 +28,15 @@ def plot_peturbed_noise(uploaded_file, sign_data_grad):
     plt.title('Gradient Direction')
     plt.axis('off')
     plt.colorbar()
-    plt.savefig(f'./pic/{uploaded_file}_peturbed_noise.png')
+    plt.savefig(f'./pic/{uploaded_file}_gradient_distribution.png')
 
 
 def plot_attacked_image(uploaded_file, attacked_image):
     attacked_image_detach = attacked_image.detach()
     attacked_image_detach = attacked_image_detach.squeeze(0).permute(1, 2, 0).numpy()
 
-    image = (attacked_image_detach * 255).astype(np.uint8)
-    cv2.imwrite(f'./pic/{uploaded_file}_attacked_image.png', image)
+    attacked_image = (attacked_image_detach * 255).astype(np.uint8)
+    cv2.imwrite(f'./pic/{uploaded_file}_attacked_image.png', attacked_image)
 
 
 def fgsm_attack(image, epsilon, data_grad, uploaded_file):
@@ -38,7 +45,8 @@ def fgsm_attack(image, epsilon, data_grad, uploaded_file):
     perturbed_image = image + epsilon * sign_data_grad
     perturbed_image = torch.clamp(perturbed_image, 0, 1)
 
-    plot_peturbed_noise(uploaded_file, sign_data_grad)
+    plot_gradinet_distribution(uploaded_file, sign_data_grad)
+    plot_perturbed_image(uploaded_file, sign_data_grad)
     plot_attacked_image(uploaded_file, perturbed_image)
 
     return perturbed_image
@@ -90,7 +98,6 @@ def image_attack(uploaded_file, epsilon):
     target_class = torch.argmax(output, dim=1).item()
 
     orginal_class = class_list[target_class]
-    print(orginal_class)
 
     loss = nn.CrossEntropyLoss()
     gradients = torch.autograd.grad(loss(output, torch.tensor(target_class).reshape(-1)), image)[0]
@@ -145,8 +152,12 @@ def main():
             st.write(f"The class of the attacked image is :poop: :rainbow[{attacked_image_class}]")
             st.divider()
 
-            st.image(f"./pic/{uploaded_file.name.split('.')[0]}_peturbed_noise.png", caption="Gradient Distribution", use_column_width=True)
+            st.image(f"./pic/{uploaded_file.name.split('.')[0]}_gradient_distribution.png", caption="Gradient Distribution", use_column_width=True)
             st.write(f":earth_africa: The gradient distribution of uploaded image.")
+            st.divider()
+
+            st.image(f"./pic/{uploaded_file.name.split('.')[0]}_noise_image.png", caption="Noise Image", use_column_width=True)
+            st.write(f":: The noise image after attack.")
             st.divider()
 
             st.image(f"./pic/{uploaded_file.name.split('.')[0]}_difference.png", caption="Output Difference", use_column_width=True)
